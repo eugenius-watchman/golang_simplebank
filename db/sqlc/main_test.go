@@ -28,6 +28,8 @@ var (
 // TestMain is the entry point for database tests
 // It runs before any other tests in the package
 func TestMain(m *testing.M) {
+	VerifyGoVersion("go1.22.0")
+
 	var err error
 	
 	// Establish database connection
