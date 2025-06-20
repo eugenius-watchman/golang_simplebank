@@ -1,8 +1,8 @@
 module github.com/eugenius-watchman/golang_simplebank
 
-go 1.23.0
+go 1.23
 
-toolchain go1.23.10
+toolchain go1.23.1
 
 require github.com/lib/pq v1.10.9
 
