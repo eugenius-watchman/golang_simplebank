@@ -1,0 +1,8 @@
+# Creating a .gitignore file ...Go projects
+echo "/bin/
+/.idea/
+/vendor/
+*.exe
+*.test
+*.prof
+.env" > .gitignore

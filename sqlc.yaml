@@ -1,0 +1,28 @@
+# version: "2"
+# cloud:
+#     organization: ""
+#     project: ""
+#     hostname: ""
+# servers: []
+# sql: []
+# overrides:
+#     go: null
+# plugins: []
+# rules: []
+# options: {}
+
+version: "2"
+sql:
+  - engine: "postgresql"  # or "mysql"
+    schema: "./db/migration/"  # Path to SQL schema files
+    queries: "./db/query/" # Path to SQL query files
+    gen:
+      go:
+        package: "db"       # Go package name (e.g., `package db`)
+        out: "./db/sqlc"  # Output directory (e.g., `internal/db`)
+        # sql_package: "pgx/v5"  # Use "database/sql" or "pgx/v5"
+        sql_package: "database/sql"
+        emit_json_tags: true   # If you need JSON tags
+        emit_prepared_queries: false # For better performance
+        emit_interface: false  # If you want a querier interface
+        overrides: []  # Optional column type overrides
