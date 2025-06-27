@@ -20,6 +20,9 @@ test:
 	go test -v -cover ./...
 
 server:
-	go run main.go
+	go run main.gomockgen -package mockdb -destination db/mock/store.go github.com/eugenius-watchman/golang_simplebank/db/sqlc Store
 
-.PHONY: postgres createdb dropdb migrateup migratedown sqlc test server
+mock:
+
+
+.PHONY: postgres createdb dropdb migrateup migratedown sqlc test server mock

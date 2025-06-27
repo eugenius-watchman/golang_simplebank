@@ -24,6 +24,6 @@ sql:
         sql_package: "database/sql"
         emit_json_tags: true   # If you need JSON tags
         emit_prepared_queries: false # For better performance
-        emit_interface: false  # If you want a querier interface
+        emit_interface: true  # If you want a querier interface
         emit_empty_slices: true
         overrides: []  # Optional column type overrides
