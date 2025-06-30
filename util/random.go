@@ -45,7 +45,7 @@ func RandomMoney() int64 {
 
 // RandomCurrency picks a random currency from supported options
 func RandomCurrency() string {
-	currencies := []string{"GHS", "USD", "EUR"}
+	currencies := []string{GHS, USD, EUR}
 	// Create a new random generator seeded with current time
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	// Return a random currency from the slice
