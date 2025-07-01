@@ -11,9 +11,11 @@ import (
 )
 
 func createRandomAccount(t *testing.T) Account {
-	arg := CreateAccountParams {
-		Owner: util.RandomOwner(),
-		Balance: util.RandomMoney(),
+	user := createRandomUser(t)
+
+	arg := CreateAccountParams{
+		Owner:    user.Username,
+		Balance:  util.RandomMoney(),
 		Currency: util.RandomCurrency(),
 	}
 
@@ -31,11 +33,11 @@ func createRandomAccount(t *testing.T) Account {
 	return account
 }
 
-func TestCreateAccount(t *testing.T){
+func TestCreateAccount(t *testing.T) {
 	createRandomAccount(t)
 }
 
-func TestGetAccount(t *testing.T){
+func TestGetAccount(t *testing.T) {
 	// Create Account
 	account1 := createRandomAccount(t)
 	account2, err := testQueries.GetAccount(context.Background(), account1.ID)
@@ -50,12 +52,12 @@ func TestGetAccount(t *testing.T){
 }
 
 // Test for UpdateAccount funtion
-func TestUpdateAccoun(t *testing.T){
+func TestUpdateAccoun(t *testing.T) {
 	account1 := createRandomAccount(t)
 
 	arg := UpdateAccountParams{
-		ID: account1.ID,
-		Balance: util.RandomMoney(),		
+		ID:      account1.ID,
+		Balance: util.RandomMoney(),
 	}
 
 	account2, err := testQueries.UpdateAccount(context.Background(), arg)
@@ -71,7 +73,7 @@ func TestUpdateAccoun(t *testing.T){
 }
 
 // Test for DeleteAccount() function
-func TestDeleteAccount(t *testing.T){
+func TestDeleteAccount(t *testing.T) {
 	account1 := createRandomAccount(t)
 	err := testQueries.DeleteAccount(context.Background(), account1.ID)
 	require.NoError(t, err)
@@ -83,12 +85,12 @@ func TestDeleteAccount(t *testing.T){
 }
 
 // Test for ListAccount() funcion
-func TestListAccount(t *testing.T){
-	for i :=0; i < 10; i++ {
+func TestListAccount(t *testing.T) {
+	for i := 0; i < 10; i++ {
 		createRandomAccount(t)
 	}
 	arg := ListAccountsParams{
-		Limit: 5,
+		Limit:  5,
 		Offset: 5,
 	}
 
@@ -100,4 +102,4 @@ func TestListAccount(t *testing.T){
 		require.NotEmpty(t, account)
 	}
 
-}  
+}

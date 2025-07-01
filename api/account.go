@@ -2,10 +2,12 @@ package api
 
 import (
 	"database/sql"
+	// "log"
 	"net/http"
 
 	db "github.com/eugenius-watchman/golang_simplebank/db/sqlc"
 	"github.com/gin-gonic/gin"
+	"github.com/lib/pq"
 )
 
 // new struct to store the create account request
@@ -29,6 +31,14 @@ func (server *Server) createAccount(ctx *gin.Context) {
 
 	account, err := server.store.CreateAccount(ctx, arg)
 	if err != nil {
+		if pqErr, ok := err.(*pq.Error); ok {
+			// log.Println(pqErr.Code.Name())
+			switch pqErr.Code.Name() {
+			case "foreign_key_violation", "unique_violation":
+				ctx.JSON(http.StatusForbidden, errorReponse(err))
+				return
+			}
+		}
 		ctx.JSON(http.StatusInternalServerError, errorReponse(err))
 		return
 	}
@@ -50,7 +60,7 @@ func (server *Server) getAccount(ctx *gin.Context) {
 
 	account, err := server.store.GetAccount(ctx, req.ID)
 	if err != nil {
-		if err == sql.ErrNoRows{
+		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorReponse(err))
 			return
 		}
@@ -61,12 +71,10 @@ func (server *Server) getAccount(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, account)
 }
 
-
 // store listAccount parameters ...list account request
 type listAccountRequest struct {
-	PageID int32 `form:"page_id" binding:"required,min=1"`
+	PageID   int32 `form:"page_id" binding:"required,min=1"`
 	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
-
 }
 
 func (server *Server) listAccount(ctx *gin.Context) {
@@ -77,12 +85,12 @@ func (server *Server) listAccount(ctx *gin.Context) {
 	}
 
 	arg := db.ListAccountsParams{
-		Limit: req.PageSize,
+		Limit:  req.PageSize,
 		Offset: (req.PageID - 1) * req.PageSize,
 	}
 
 	account, err := server.store.ListAccounts(ctx, arg)
-	if err != nil { 
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorReponse(err))
 		return
 	}
@@ -90,14 +98,13 @@ func (server *Server) listAccount(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, account)
 }
 
-
 // store update account parameters ...update request
 type updateAccountRequest struct {
-	ID int64 `uri:"id" binding:"required,min=1"` // URL path
+	ID      int64 `uri:"id" binding:"required,min=1"` // URL path
 	Balance int64 `json:"balance" binding:"required"` // request body
 }
 
-func (server *Server) updateAccount(ctx *gin.Context){
+func (server *Server) updateAccount(ctx *gin.Context) {
 	// empty object list
 	var req updateAccountRequest
 
@@ -113,7 +120,7 @@ func (server *Server) updateAccount(ctx *gin.Context){
 
 	// Prepare to update data
 	arg := db.UpdateAccountParams{
-		ID: req.ID,
+		ID:      req.ID,
 		Balance: req.Balance,
 	}
 
@@ -136,7 +143,7 @@ type deleteAccountRequest struct {
 	ID int64 `uri:"id" binding:"required,min=1"`
 }
 
-func (server *Server) deleteAccount(ctx *gin.Context){
+func (server *Server) deleteAccount(ctx *gin.Context) {
 	// empty request object
 	var req deleteAccountRequest
 
