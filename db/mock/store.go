@@ -23,6 +23,10 @@ type MockStoreMockRecorder struct {
 	mock *MockStore
 }
 
+func (mr *MockStoreMockRecorder) CreateSession(matcher gomock.Matcher, param2 gomock.Matcher) {
+	panic("unimplemented")
+}
+
 // NewMockStore creates a new mock instance.
 func NewMockStore(ctrl *gomock.Controller) *MockStore {
 	mock := &MockStore{ctrl: ctrl}

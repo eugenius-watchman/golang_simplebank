@@ -2,7 +2,7 @@ package db
 
 import (
 	"context"
-	//"database/sql"
+	// "database/sql"
 	"testing"
 	"time"
 
@@ -17,7 +17,7 @@ func createRandomUser(t *testing.T) User {
 		Username:       util.RandomOwner(),
 		HashedPassword: hashedPassword,
 		FullName:       util.RandomOwner(),
-		Email:          util.RadomEmail(),
+		Email:          util.RandomEmail(),
 	}
 
 	user, err := testQueries.CreateUser(context.Background(), arg)
