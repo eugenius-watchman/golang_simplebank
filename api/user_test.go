@@ -243,7 +243,9 @@ func TestLoginUserAPI(t *testing.T) {
 					Return(db.User{}, nil)
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusNotFound, recorder.Code)
+				//require.Equal(t, http.StatusNotFound, recorder.Code)
+				require.Equal(t, http.StatusUnauthorized, recorder.Code)
+
 			},
 		},
 		{
@@ -337,10 +339,10 @@ func randomUser(t *testing.T) (user db.User, password string) {
 	return
 }
 
-func newTestServer(t *testing.T, store db.Store) *Server {
-	server := NewServer(store)
-	return server
-}
+// func newTestServer(t *testing.T, store db.Store) *Server {
+// 	server := NewServer(t, store)
+// 	return server
+// }
 
 func requireBodyMatchUser(t *testing.T, body *bytes.Buffer, user db.User) {
 	data, err := io.ReadAll(body)
