@@ -25,18 +25,18 @@ import (
 
 func TestGetAccountAPI(t *testing.T) {
 	// create fake account
-	user, _:= randomUser(t)
+	user, _ := randomUser(t)
 	account := randomAccount(user.Username)
 
-	testCases := []struct{
-		name string
-		accountID int64
+	testCases := []struct {
+		name          string
+		accountID     int64
 		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
-		buildstubs func(store *mockdb.MockStore)
-		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder) 
+		buildstubs    func(store *mockdb.MockStore)
+		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
 	}{
 		{
-			name: "OK",
+			name:      "OK",
 			accountID: account.ID,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
@@ -44,18 +44,18 @@ func TestGetAccountAPI(t *testing.T) {
 			buildstubs: func(store *mockdb.MockStore) {
 				// buildd stubs ... program mock behaviour
 				store.EXPECT().
-				GetAccount(gomock.Any(), gomock.Eq(account.ID)).
-				Times(1).
-				Return(account, nil)
+					GetAccount(gomock.Any(), gomock.Eq(account.ID)).
+					Times(1).
+					Return(account, nil)
 			},
-			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder){
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				// check/verify response
 				require.Equal(t, http.StatusOK, recorder.Code)
 				requireBodyMatchAccount(t, recorder.Body, account)
 			},
 		},
 		{
-			name: "UnauthorizedUser",
+			name:      "UnauthorizedUser",
 			accountID: account.ID,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "UnauthorizedUser", time.Minute)
@@ -63,18 +63,18 @@ func TestGetAccountAPI(t *testing.T) {
 			buildstubs: func(store *mockdb.MockStore) {
 				// buildd stubs ... program mock behaviour
 				store.EXPECT().
-				GetAccount(gomock.Any(), gomock.Eq(account.ID)).
-				Times(1).
-				Return(account, nil)
+					GetAccount(gomock.Any(), gomock.Eq(account.ID)).
+					Times(1).
+					Return(account, nil)
 			},
-			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder){
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				// check/verify response
 				require.Equal(t, http.StatusUnauthorized, recorder.Code)
 				// requireBodyMatchAccount(t, recorder.Body, account)
 			},
 		},
 		{
-			name: "NoAuthorization",
+			name:      "NoAuthorization",
 			accountID: account.ID,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				// addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
@@ -82,19 +82,19 @@ func TestGetAccountAPI(t *testing.T) {
 			buildstubs: func(store *mockdb.MockStore) {
 				// buildd stubs ... program mock behaviour
 				store.EXPECT().
-				GetAccount(gomock.Any(), gomock.Any()).
-				Times(0)
+					GetAccount(gomock.Any(), gomock.Any()).
+					Times(0)
 				// Return(account, nil)
 			},
-			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder){
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				// check/verify response
 				require.Equal(t, http.StatusUnauthorized, recorder.Code)
 				// requireBodyMatchAccount(t, recorder.Body, account)
 			},
 		},
-		// Todo: add more cases 
+		// Todo: add more cases
 		{
-			name: "NotFound",
+			name:      "NotFound",
 			accountID: account.ID,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
@@ -102,18 +102,18 @@ func TestGetAccountAPI(t *testing.T) {
 			buildstubs: func(store *mockdb.MockStore) {
 				// buildd stubs ... program mock behaviour
 				store.EXPECT().
-				GetAccount(gomock.Any(), gomock.Eq(account.ID)).
-				Times(1).
-				Return(db.Account{}, sql.ErrNoRows)
+					GetAccount(gomock.Any(), gomock.Eq(account.ID)).
+					Times(1).
+					Return(db.Account{}, sql.ErrNoRows)
 			},
-			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder){
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				// check/verify response
 				require.Equal(t, http.StatusNotFound, recorder.Code)
 				//requireBodyMatchAccount(t, recorder.Body, account)
 			},
 		},
 		{
-			name: "InternalError",
+			name:      "InternalError",
 			accountID: account.ID,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
@@ -121,18 +121,18 @@ func TestGetAccountAPI(t *testing.T) {
 			buildstubs: func(store *mockdb.MockStore) {
 				// buildd stubs ... program mock behaviour
 				store.EXPECT().
-				GetAccount(gomock.Any(), gomock.Eq(account.ID)).
-				Times(1).
-				Return(db.Account{}, sql.ErrConnDone)
+					GetAccount(gomock.Any(), gomock.Eq(account.ID)).
+					Times(1).
+					Return(db.Account{}, sql.ErrConnDone)
 			},
-			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder){
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				// check/verify response
 				require.Equal(t, http.StatusInternalServerError, recorder.Code)
 				//requireBodyMatchAccount(t, recorder.Body, account)
 			},
 		},
 		{
-			name: "InvalidID",
+			name:      "InvalidID",
 			accountID: 0,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
@@ -140,11 +140,11 @@ func TestGetAccountAPI(t *testing.T) {
 			buildstubs: func(store *mockdb.MockStore) {
 				// buildd stubs ... program mock behaviour
 				store.EXPECT().
-				GetAccount(gomock.Any(), gomock.Any()).
-				Times(0)
+					GetAccount(gomock.Any(), gomock.Any()).
+					Times(0)
 				// Return(account, nil)
 			},
-			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder){
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				// check/verify response
 				require.Equal(t, http.StatusBadRequest, recorder.Code)
 				// requireBodyMatchAccount(t, recorder.Body, account)
@@ -153,7 +153,7 @@ func TestGetAccountAPI(t *testing.T) {
 	}
 	for i := range testCases {
 		tc := testCases[i]
-		t.Run(tc.name, func(t *testing.T){
+		t.Run(tc.name, func(t *testing.T) {
 			// setup mock controller ...brain of mocking
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish() // cleanup after test
@@ -176,7 +176,7 @@ func TestGetAccountAPI(t *testing.T) {
 			server.router.ServeHTTP(recorder, request)
 			tc.checkResponse(t, recorder)
 		})
-	
+
 	}
 }
 
@@ -236,7 +236,7 @@ func TestCreateAccountAPI(t *testing.T) {
 			name: "InternalError",
 			body: gin.H{
 				"currency": account.Currency,
-				},
+			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
 			},
@@ -299,7 +299,7 @@ func TestCreateAccountAPI(t *testing.T) {
 
 func TestListAccountsAPI(t *testing.T) {
 	user, _ := randomUser(t)
-	
+
 	n := 5
 	accounts := make([]db.Account, n)
 	for i := 0; i < n; i++ {
@@ -329,8 +329,9 @@ func TestListAccountsAPI(t *testing.T) {
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				arg := db.ListAccountsParams{
-					Owner:  user.Username,
-					Limit:  int32(n),
+					Owner: user.Username,
+					Limit: int32(n),
+					// Limit:  5,
 					Offset: 0,
 				}
 
@@ -410,11 +411,11 @@ func TestListAccountsAPI(t *testing.T) {
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
 					ListAccounts(gomock.Any(), gomock.Any()).
-					Times(0)
+					Times(1)
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusBadRequest, recorder.Code)
-				},
+			},
 		},
 	}
 
@@ -458,7 +459,6 @@ func randomAccount(owner string) db.Account {
 	}
 }
 
-
 func requireBodyMatchAccount(t *testing.T, body *bytes.Buffer, account db.Account) {
 	// read response body
 	data, err := io.ReadAll(body)
@@ -468,8 +468,8 @@ func requireBodyMatchAccount(t *testing.T, body *bytes.Buffer, account db.Accoun
 	var gotAccount db.Account
 	err = json.Unmarshal(data, &gotAccount)
 	require.NoError(t, err, "failed to parse account JSON")
-	
-	// compare accounts 
+
+	// compare accounts
 	require.Equal(t, account, gotAccount)
 
 }

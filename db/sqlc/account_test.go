@@ -10,13 +10,37 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func randomAccount(owner string) Account {
+	if owner == "" {
+		owner = util.RandomOwner()
+	}
+	
+	return Account{
+		ID:       util.RandomInt(1, 1000),
+		Owner:    owner,
+		Balance:  util.RandomMoney(),
+		Currency: util.RandomCurrency(),
+		CreatedAt: time.Now(),
+	}
+}
+
 func createRandomAccount(t *testing.T) Account {
 	user := createRandomUser(t)
 
+	// using random account helper function
+	randomAcc := randomAccount(user.Username)
+
+
+	// arg := CreateAccountParams{
+	// 	Owner:    user.Username,
+	// 	Balance:  util.RandomMoney(),
+	// 	Currency: util.RandomCurrency(),
+	// }
+
 	arg := CreateAccountParams{
-		Owner:    user.Username,
-		Balance:  util.RandomMoney(),
-		Currency: util.RandomCurrency(),
+		Owner:    randomAcc.Owner,
+		Balance:  randomAcc.Balance,
+		Currency: randomAcc.Currency,
 	}
 
 	account, err := testQueries.CreateAccount(context.Background(), arg)

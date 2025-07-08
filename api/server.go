@@ -44,6 +44,9 @@ func NewServer(config util.Config, store db.Store) (*Server, error) {
 func (server *Server) setupRouter() {
 	router := gin.Default()
 
+	// Disable automatic trailing slash redirection
+	router.RedirectTrailingSlash = false
+
 	// Add routes to router
 	router.POST("/users", server.CreateUser)
 	router.POST("/users/login", server.loginUser)
