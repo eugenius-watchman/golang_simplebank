@@ -9,13 +9,13 @@ import (
 	"testing"
 	"time"
 
+	mockdb "github.com/eugenius-watchman/golang_simplebank/db/mock"
+	db "github.com/eugenius-watchman/golang_simplebank/db/sqlc"
+	"github.com/eugenius-watchman/golang_simplebank/token"
+	"github.com/eugenius-watchman/golang_simplebank/util"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
-mockdb "github.com/eugenius-watchman/golang_simplebank/db/mock" 	
-db "github.com/eugenius-watchman/golang_simplebank/db/sqlc" 
-	"github.com/eugenius-watchman/golang_simplebank/token"
-	"github.com/eugenius-watchman/golang_simplebank/util"
 )
 
 func TestTransferAPI(t *testing.T) {
@@ -116,7 +116,11 @@ func TestTransferAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user1.Username, time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				//store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account1.ID)).Times(1).Return(db.Account{}, db.ErrRecordNotFound)
+				// store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account1.ID)).Times(1).Return(db.Account{}, db.ErrRecordNotFound)
+				store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account1.ID)).
+				Times(1).
+				Return(db.Account{}, sql.ErrNoRows)
+
 				store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account2.ID)).Times(0)
 				store.EXPECT().TransferTx(gomock.Any(), gomock.Any()).Times(0)
 			},
@@ -138,6 +142,8 @@ func TestTransferAPI(t *testing.T) {
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account1.ID)).Times(1).Return(account1, nil)
 				//store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account2.ID)).Times(1).Return(db.Account{}, db.ErrRecordNotFound)
+				store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account2.ID)).Times(1).Return(db.Account{}, sql.ErrNoRows)
+
 				store.EXPECT().TransferTx(gomock.Any(), gomock.Any()).Times(0)
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
