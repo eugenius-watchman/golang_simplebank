@@ -52,7 +52,7 @@ jobs:
         docker push $REGISTRY/$REPOSITORY:latest
 
     - name: Update kube config
-      run: aws eks update-kubeconfig --name simple-bank --region us-east-1
+      run: aws eks update-kubeconfig --name simple_bank --region us-east-1
 
     - name: Verify push succeeded
       run: |
