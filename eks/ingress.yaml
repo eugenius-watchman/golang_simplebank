@@ -28,3 +28,4 @@ spec:
   - hosts:
     - api.simplebanke.com
     secretName: simple-bank-api-cert
+  

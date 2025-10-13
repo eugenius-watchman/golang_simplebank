@@ -52,7 +52,7 @@ jobs:
         docker push $REGISTRY/$REPOSITORY:latest
 
     - name: Update kube config
-      run: aws eks update-kubeconfig --region us-east-1 --name simple_bank
+      run: aws eks update-kubeconfig --name simple-bank --region us-east-1
 
     - name: Verify push succeeded
       run: |
@@ -64,8 +64,6 @@ jobs:
         REPOSITORY: simplebank
         IMAGE_TAG: ${{ github.sha }}
       run: | 
-        # Remove this duplicate line - we already updated kubeconfig above
-        # aws eks update-kubeconfig --region us-east-1 --name simple_bank
         kubectl apply -f eks/aws-auth.yaml
         kubectl apply -f eks/deployment.yaml
         kubectl apply -f eks/service.yaml
