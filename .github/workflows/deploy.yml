@@ -6,9 +6,9 @@ name: Deploy to production
 on:
   push:
     branches: [ "main" ]
-    
+
 jobs:
-  build:
+  deploy:
     name: Build image
     runs-on: ubuntu-latest
 
@@ -16,6 +16,13 @@ jobs:
     # Required for accessing your code
     - name: Checkout code
       uses: actions/checkout@v4
+
+    # Install kubectl (FIXED: proper indentation and structure)
+    - name: Install kubectl
+      uses: azure/setup-kubectl@v4
+      with:
+        version: 'v1.34.1'  # Match your kubectl version
+      id: install
 
     # AWS Auth
     - name: Configure AWS Credentials
@@ -46,14 +53,23 @@ jobs:
         IMAGE_TAG: ${{ github.sha }}
       run: |
         docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:latest . || exit 1
-        docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+        docker push -a $REGISTRY/$REPOSITORY
         docker push $REGISTRY/$REPOSITORY:latest || exit 1
 
     # Verification (silent but crucial)
     - name: Verify push succeeded
       run: |
         aws ecr describe-images --repository-name simplebank --region us-east-1 | jq -e '.imageDetails | length > 0' || (echo "Error: No images found in ECR"; exit 1)
+    
+    - name: Deploy image to Amazon EKS 
+      run: | 
+        kubectl apply -f eks/aws-auth.yaml
+        kubectl apply -f eks/deployment.yaml
+        kubectl apply -f eks/service.yaml
+        kubectl apply -f eks/issuer.yaml
+        kubectl apply -f eks/ingress.yaml
 
+        
 # name: Deploy to production
 
 # on:
