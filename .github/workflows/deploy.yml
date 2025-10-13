@@ -49,6 +49,9 @@ jobs:
         docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
         docker push $REGISTRY/$REPOSITORY:latest || exit 1
 
+    - name: upddate kube config
+      run: aws eks update-kubeconfig --name simple_bank --region us-east-1
+
     # Verification (silent but crucial)
     - name: Verify push succeeded
       run: |
