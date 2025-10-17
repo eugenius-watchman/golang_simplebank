@@ -220,10 +220,10 @@ func TestLoginUserAPI(t *testing.T) {
 					GetUser(gomock.Any(), gomock.Eq(user.Username)).
 					Times(1).
 					Return(user, nil)
-				// store.EXPECT().
-				// 	CreateSession(gomock.Any(), gomock.Any()).
-				// 	Times(1)
-				// 	Return(db.session{}, nil)
+				store.EXPECT().
+					CreateSession(gomock.Any(), gomock.Any()).
+					Times(1).
+				 	Return(db.Session{}, nil)
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
@@ -237,14 +237,19 @@ func TestLoginUserAPI(t *testing.T) {
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
-					GetUser(gomock.Any(), gomock.Any()).
+					GetUser(gomock.Any(), gomock.Eq("NotFound")).
+					//GetUser(gomock.Any(), gomock.Any("NotFound")).
 					Times(1).
-					//Return(db.User{}, db.ErrRecordNotFound)
-					Return(db.User{}, nil)
+					Return(db.User{}, sql.ErrNoRows)
+				// Return(db.User{}, db.ErrRecordNotFound)
+				// Return(db.User{}, nil)
+				store.EXPECT().
+					CreateSession(gomock.Any(), gomock.Any()).
+					Times(0)
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
-				//require.Equal(t, http.StatusNotFound, recorder.Code)
-				require.Equal(t, http.StatusUnauthorized, recorder.Code)
+				require.Equal(t, http.StatusNotFound, recorder.Code)
+				// require.Equal(t, http.StatusUnauthorized, recorder.Code)
 
 			},
 		},
@@ -259,6 +264,9 @@ func TestLoginUserAPI(t *testing.T) {
 					GetUser(gomock.Any(), gomock.Eq(user.Username)).
 					Times(1).
 					Return(user, nil)
+				store.EXPECT().
+					CreateSession(gomock.Any(), gomock.Any()).
+					Times(0) // Should not be calledd when password is wrong
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusUnauthorized, recorder.Code)

@@ -18,11 +18,12 @@ func TestPasetoMaker(t *testing.T) {
 	issuedAt := time.Now()
 	expiredAt := issuedAt.Add(duration)
 
-	token, err := maker.CreateToken(username, duration)
+	token, payload, err := maker.CreateToken(username, duration)
 	require.NoError(t, err)
 	require.NotEmpty(t, token)
+    require.NotEmpty(t, payload)
 
-	payload, err := maker.VerifyToken(token)
+	payload, err = maker.VerifyToken(token)
 	require.NoError(t, err)
 	require.NotEmpty(t, payload)
 
@@ -39,12 +40,14 @@ func TestExpiredPasetoToken(t *testing.T) {
 
 	// Create token that expires immediately (negative duration)
 	username := util.RandomOwner()
-	token, err := maker.CreateToken(username, -time.Minute) // Negative duration makes it expired
+	token, payload, err := maker.CreateToken(username, -time.Minute) // Negative duration makes it expired
 	require.NoError(t, err)
 	require.NotEmpty(t, token)
+    require.NotEmpty(t, payload)
+
 
 	// Try to verify the expired token
-	payload, err := maker.VerifyToken(token)
+	payload, err = maker.VerifyToken(token)
 
 	// We EXPECT this to fail with an error
 	require.Error(t, err)                               // Should get an error
@@ -61,9 +64,11 @@ func TestInvalidPasetoToken(t *testing.T) {
 
     // create valid token first then later modify to make invalid
     username := util.RandomOwner()
-    validToken, err := maker.CreateToken(username, time.Minute)
+    validToken, payload, err := maker.CreateToken(username, time.Minute)
     require.NoError(t, err)
     require.NotEmpty(t, validToken)
+    require.NotEmpty(t, payload)
+
 
     // Testing different invalid token scenarios
     testCases := []struct {
@@ -105,8 +110,12 @@ func TestInvalidPasetoToken(t *testing.T) {
             name: "WrongKeyToken",
             token: func() string {
                 // Creating token with different key
-                badMaker, _ := NewPasetoMaker(util.RandomString(32))
-                token, _ := badMaker.CreateToken(username, time.Minute)
+                badMaker, err := NewPasetoMaker(util.RandomString(32))
+                require.NoError(t, err)
+                
+                token, payload, err := badMaker.CreateToken(username, time.Minute)
+                require.NoError(t, err)
+                require.NotEmpty(t, payload)
                 return token
             }(),
             check: func(t *testing.T, payload *Payload, err error) {

@@ -5,4 +5,5 @@ echo "/bin/
 *.exe
 *.test
 *.prof
+*.log
 .env" > .gitignore

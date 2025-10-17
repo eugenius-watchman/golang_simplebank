@@ -19,11 +19,13 @@ func TestJWTMaker(t *testing.T) {
 	issuedAt := time.Now()
 	expiredAt := issuedAt.Add(duration)
 
-	token, err := maker.CreateToken(username, duration)
+	token, payload, err := maker.CreateToken(username, duration)
 	require.NoError(t, err)
 	require.NotEmpty(t, token)
+	require.NotEmpty(t, payload)
 
-	payload, err := maker.VerifyToken(token)
+
+	payload, err = maker.VerifyToken(token)
 	require.NoError(t, err)
 	require.NotEmpty(t, payload)
 
@@ -40,12 +42,14 @@ func TestExpiredJWTToken(t *testing.T) {
 
 	// Create token that expires immediately (negative duration)
 	username := util.RandomOwner()
-	token, err := maker.CreateToken(username, -time.Minute) // Negative duration makes it expired
+	token, payload, err := maker.CreateToken(username, -time.Minute) // Negative duration makes it expired
 	require.NoError(t, err)
 	require.NotEmpty(t, token)
+	require.NotEmpty(t, payload)
+
 
 	// Try to verify the expired token
-	payload, err := maker.VerifyToken(token)
+	payload, err = maker.VerifyToken(token)
 
 	// We EXPECT this to fail with an error
 	require.Error(t, err)                               // Should get an error
