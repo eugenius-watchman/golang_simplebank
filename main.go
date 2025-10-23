@@ -3,11 +3,16 @@ package main
 import (
 	"database/sql"
 	"log"
+	"net"
 
 	"github.com/eugenius-watchman/golang_simplebank/api"
 	db "github.com/eugenius-watchman/golang_simplebank/db/sqlc"
+	"github.com/eugenius-watchman/golang_simplebank/gapi"
+	"github.com/eugenius-watchman/golang_simplebank/pb"
 	"github.com/eugenius-watchman/golang_simplebank/util"
 	_ "github.com/lib/pq"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	// "github.com/spf13/viper"
 )
 
@@ -22,7 +27,7 @@ import (
 
 func main() {
 	// Load configuration
-	config, err := util.LaodConfig(".")
+	config, err := util.LoadConfig(".")
 	if err != nil {
 		log.Fatal("cannot load config:", err)
 	}
@@ -35,13 +40,39 @@ func main() {
 	}
 
 	store := db.NewStore(conn)
+	runGrpcServer(config, store)
+}
+
+func runGrpcServer(config util.Config, store db.Store) {
+	server, err := gapi.NewServer(config, store)
+	if err != nil {
+		log.Fatal("cannot create server:", err)
+	}
+
+	grpcServer := grpc.NewServer()
+	pb.RegisterSimpleBankServer(grpcServer, server)
+	reflection.Register(grpcServer)
+
+	listener, err := net.Listen("tcp", config.GRPCServerAddress)
+	if err != nil {
+		log.Fatal("cannot create listener")
+	}
+
+	log.Printf("start gRPC server at %s", listener.Addr().String())
+	err = grpcServer.Serve(listener)
+	if err != nil {
+		log.Fatal("cannot start gRPC server")
+	}
+}
+
+func runGinServer(config util.Config, store db.Store) {
 	// server := api.NewServer(store)
 	server, err := api.NewServer(config, store)
 	if err != nil {
 		log.Fatal("cannot create server:", err)
 	}
 
-	err = server.Start(config.ServerAddress)
+	err = server.Start(config.HTTPServerAddress)
 	if err != nil {
 		log.Fatal("cannot start server", err)
 	}

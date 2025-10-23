@@ -48,5 +48,20 @@ proto:
 	protoc --proto_path=proto --go_out=pb --go_opt=paths=source_relative \
     --go-grpc_out=pb --go-grpc_opt=paths=source_relative \
     proto/*.proto
-	
-.PHONY: postgres createdb dropdb migrateup migratedown migrateup1 migratedown1 migrateup2 migratedown2 db_docs db_schema sqlc test server mock proto
+
+# Evans gRPC client commands
+evans:
+	evans --host localhost --port 9090 --reflection
+
+evans-proto:
+	evans --host localhost --port 9090 --path proto proto/service_simple_bank.proto
+
+# Test gRPC services
+test-grpc: evans
+
+# Create user via gRPC (example)
+grpc-create-user:
+	@echo 'Creating user via gRPC...'
+	@evans --host localhost --port 9090 --reflection --call CreateUser
+
+.PHONY: postgres createdb dropdb migrateup migratedown migrateup1 migratedown1 migrateup2 migratedown2 db_docs db_schema sqlc test server mock proto evans

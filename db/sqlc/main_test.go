@@ -30,7 +30,7 @@ var (
 // It runs before any other tests in the package
 func TestMain(m *testing.M) {
 	// Load config from root directory (where app.env lives)
-	config, err := util.LaodConfig("../..")
+	config, err := util.LoadConfig("../..")
 	if err != nil {
 		log.Fatal("cannot load config:", err)
 	}
