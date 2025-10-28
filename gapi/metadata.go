@@ -8,37 +8,35 @@ import (
 )
 
 const (
-	grpcGatewayUserAgentHeader  = "grpcgateway-user-agent"
-	userAgentHeader 			= "user-agent"
-	xForwardedForHeader 		= "x-forwarded-for"
+	grpcGatewayUserAgentHeader = "grpcgateway-user-agent"
+	userAgentHeader            = "user-agent"
+	xForwardedForHeader        = "x-forwarded-for"
 )
 
 type Metadata struct {
 	UserAgent string
-	ClinetIP  string
+	ClientIP  string
 }
 
-func (server *Server) extraMetadata(ctx context.Context) *Metadata {
+func (server *Server) extractMetadata(ctx context.Context) *Metadata {
 	mtdt := &Metadata{}
 
 	if md, ok := metadata.FromIncomingContext(ctx); ok {
-		if UserAgents := md.Get(grpcGatewayUserAgentHeader); len(UserAgents) > 0 {
-			mtdt.UserAgent = UserAgents[0]
+		if userAgents := md.Get(grpcGatewayUserAgentHeader); len(userAgents) > 0 {
+			mtdt.UserAgent = userAgents[0]
 		}
 
-		if UserAgents := md.Get(userAgentHeader); len(UserAgents) > 0 {
-			mtdt.UserAgent = UserAgents[0]
+		if userAgents := md.Get(userAgentHeader); len(userAgents) > 0 {
+			mtdt.UserAgent = userAgents[0]
 		}
-
 
 		if clientIPs := md.Get(xForwardedForHeader); len(clientIPs) > 0 {
-			mtdt.ClinetIP = clientIPs[0]
+			mtdt.ClientIP = clientIPs[0]
 		}
 	}
 
-	// getting clientIP for grpc
 	if p, ok := peer.FromContext(ctx); ok {
-		mtdt.ClinetIP = p.Addr.String()
+		mtdt.ClientIP = p.Addr.String()
 	}
 
 	return mtdt
