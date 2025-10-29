@@ -7,8 +7,8 @@ COPY . .
 RUN go build -o /app/main main.go
 
 # Install migrate (fixed extraction path)
-RUN apk add curl tar
-RUN curl -L https://github.com/golang-migrate/migrate/releases/download/v4.18.3/migrate.linux-amd64.tar.gz | tar xvz -C /app
+# RUN apk add curl tar
+# RUN curl -L https://github.com/golang-migrate/migrate/releases/download/v4.18.3/migrate.linux-amd64.tar.gz | tar xvz -C /app
 
 # Run stage
 FROM alpine:3.22
@@ -16,16 +16,17 @@ WORKDIR /app
 
 # Copy binaries
 COPY --from=builder /app/main .
-COPY --from=builder /app/migrate ./migrate 
+# COPY --from=builder /app/migrate ./migrate 
 
 # Copy config and migrations
 COPY app.env .
 COPY start.sh .
 COPY wait-for.sh .
-COPY db/migration ./migration
+COPY db/migration ./db/migration
 
 EXPOSE 8080
 CMD ["/app/main"]
+ENTRYPOINT [ "/app/start.sh" ]
 
 ## Multistage docker file 
 # # Build stage
