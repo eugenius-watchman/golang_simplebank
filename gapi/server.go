@@ -8,9 +8,10 @@ import (
 	"github.com/eugenius-watchman/golang_simplebank/pb"
 	"github.com/eugenius-watchman/golang_simplebank/token"
 	"github.com/eugenius-watchman/golang_simplebank/util"
-// 	"google.golang.org/grpc/codes"
-// 	"google.golang.org/grpc/status"
- )
+	"github.com/eugenius-watchman/golang_simplebank/worker"
+	// 	"google.golang.org/grpc/codes"
+	// 	"google.golang.org/grpc/status"
+)
 
 // Server to serve HTTP requests for bank services
 type Server struct {
@@ -18,10 +19,11 @@ type Server struct {
 	config     util.Config
 	store      db.Store
 	tokenMaker token.Maker
+	taskDistributor worker.TaskDistributor
 }
 
 // NewServer instance to setup/create a new HTTP/API server routing for services on the server
-func NewServer(config util.Config, store db.Store) (*Server, error) {
+func NewServer(config util.Config, store db.Store, taskDistributor worker.TaskDistributor) (*Server, error) {
 	// tokenMaker, err := token.NewJWTMaker(config.TokenSymmetricKey)
 	tokenMaker, err := token.NewPasetoMaker(config.TokenSymmetricKey)
 	if err != nil {
@@ -32,6 +34,7 @@ func NewServer(config util.Config, store db.Store) (*Server, error) {
 		config:     config,
 		store:      store,
 		tokenMaker: tokenMaker,
+		taskDistributor: taskDistributor,
 	}
 
 	return server, nil

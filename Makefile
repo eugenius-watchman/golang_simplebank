@@ -68,4 +68,7 @@ grpc-create-user:
 	@echo 'Creating user via gRPC...'
 	@evans --host localhost --port 9090 --reflection --call CreateUser
 
-.PHONY: postgres createdb dropdb migrateup migratedown migrateup1 migratedown1 migrateup2 migratedown2 db_docs db_schema sqlc test server mock proto evans
+redis:
+	docker run --name redis -p 6379:6379 -d redis:7-alpine
+
+.PHONY: postgres createdb dropdb migrateup migratedown migrateup1 migratedown1 migrateup2 migratedown2 db_docs db_schema sqlc test server mock proto evans redis

@@ -14,6 +14,7 @@ type Config struct {
 	DBDriver            string        `mapstructure:"DB_DRIVER"`
 	DBSource            string        `mapstructure:"DB_SOURCE"`      // Looks for app.env or app.yaml
 	MigrationURL        string        `mapstructure:"MIGRATION_URL"`
+	RedisAddress		string		  `mapstructure:"REDIS_ADDRESS"`
 	HTTPServerAddress   string        `mapstructure:"HTTP_SERVER_ADDRESS"` // Explicitly set to env format
 	GRPCServerAddress   string        `mapstructure:"GRPC_SERVER_ADDRESS"` // Explicitly set to env format
 	TokenSymmetricKey   string        `mapstructure:"TOKEN_SYMMETRIC_KEY"`
