@@ -1,5 +1,7 @@
 # Simple Bank Backend
 
+[![CI](https://github.com/eugenius-watchman/golang_simplebank/actions/workflows/ci.yml/badge.svg)](https://github.com/eugenius-watchman/golang_simplebank/actions/workflows/ci.yml)
+
 A production-ready banking backend built with **Go**, **gRPC**, **JWT**, **Redis**, and **PostgreSQL**. 
 Deployed on **AWS EKS** with a full CI/CD pipeline.
 
